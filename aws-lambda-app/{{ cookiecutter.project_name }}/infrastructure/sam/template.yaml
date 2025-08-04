@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: {{ cookiecutter.description }}
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: {{ cookiecutter.environment_stages }}
+
+Globals:
+  Function:
+    Runtime: python{{ cookiecutter.python_version }}
+    Timeout: {{ cookiecutter.timeout }}
+    MemorySize: {{ cookiecutter.memory_size }}
+    Environment:
+      Variables:
+        ENVIRONMENT: !Ref Environment
+        LOG_LEVEL: {{ cookiecutter.log_level }}
+        AWS_REGION: {{ cookiecutter.aws_region }}
+
+Resources:
+  {{ cookiecutter.main_handler.title().replace('_', '') }}Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "{{ cookiecutter.project_slug }}-${Environment}"
+      CodeUri: ../../src/
+      Handler: handlers.{{ cookiecutter.main_handler }}.lambda_handler
+      {% if cookiecutter.use_s3_trigger == 'y' -%}
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket: !Ref {{ cookiecutter.project_name.title().replace('-', '').replace('_', '') }}Bucket
+            Events: s3:ObjectCreated:*
+      {% endif %}
+
+  {% if cookiecutter.use_s3_trigger == 'y' -%}
+  {{ cookiecutter.project_name.title().replace('-', '').replace('_', '') }}Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "{{ cookiecutter.project_slug }}-${Environment}-${AWS::AccountId}"
+  {% endif %}
