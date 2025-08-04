@@ -1,9 +1,9 @@
 {
-  "project_name": "Email Lambda App",
+  "project_name": "A Lambda Project Name",
   "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
   "author_name": "John Coletta",
   "author_email": "johnbcoletta@gmail.com",
-  "description": "A Lambda Process to Automatically Process Emails",
+  "description": "The description of the app",
   "aws_region": "us-east-1",
   "python_version": "3.11",
   "use_terraform": "y",
